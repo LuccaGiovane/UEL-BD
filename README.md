@@ -8,7 +8,7 @@ Este projeto tem como objetivo desenvolver o backend de um marketplace voltado p
 
 ## Funcionalidades Principais
 
-- Cadastro de Filmes: Os administradores poderão cadastrar novos filmes, incluindo informações como título, diretor, ano de lançamento, gênero, descrição, preço de venda e aluguel.
+- Cadastro de Filmes e séries: Os administradores poderão cadastrar novos filmes e/ou séries, incluindo informações como título, diretor, ano de lançamento, gênero, descrição, preço de venda e aluguel.
 
 - Cadastro de Clientes: Os clientes poderão se registrar na plataforma, fornecendo informações pessoais como nome, e-mail e endereço.
 

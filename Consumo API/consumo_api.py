@@ -5,6 +5,19 @@ import collections.abc
 import random as rdm
 rdm.seed(1)
 
+generos = ['Action', 'Adventure', 'Animation', 'Biography', 
+	'Comedy', 'Crime', 'Documentary', 'Drama', 
+	'Family', 'Fantasy', 'Film-Noir', 'History', 
+	'Horror', 'Music', 'Musical', 'Mystery', 'Romance', 
+	'Sci-Fi', 'Short', 'Sport', 'Thriller', 'War', 'Western']
+
+idiomas = ['Arabic', 'Cantonese', 'Central Khmer', 
+	'Chinese', 'Cornish', 'Dutch', 'English', 
+	'French', 'Gaelic', 'German', 'Greek', 
+	'Hebrew', 'Hungarian', 'Italian', 'Japanese', 
+	'Korean', 'Mandarin', 'Polish', 'Portuguese', 
+	'Romanian', 'Russian', 'Spanish', 'Swedish', 'Thai', 
+	'Ukrainian', 'Vietnamese', 'Xhosa', 'Zulu']
 
 def buscar_midia(nome_midia, chave_api):
     
@@ -28,21 +41,32 @@ def buscar_midia(nome_midia, chave_api):
 def filtrar_dados(dados_midia, tipo_midia):
     
     dados_filtrados = {
-        'titulo': dados_midia.get('Title'),
-        'sinopse': dados_midia.get('Plot'),
+        'titulo': dados_midia.get('Title').replace('\'','\'\''),
+        'sinopse': dados_midia.get('Plot').replace('\'','\'\''),
         'poster': dados_midia.get('Poster'),
         'generos': (dados_midia.get('Genre')).split(', '),
-        'diretores': dados_midia.get('Director').split(', '),
-        'atores': dados_midia.get('Actors').split(', '),
+        'atores': dados_midia.get('Actors').replace('\'','\'\''),
         'dt_lancamento': dados_midia.get('Released'),
-        'valor': round(rdm.uniform(20.0,120.0),2),
         'idiomas': dados_midia.get('Language').split(', ')
     }
+    # verifica se ha idiomas que nao serão usados
+    for i in dados_filtrados['idiomas']:
+        if idiomas.count(i)==0:
+            dados_filtrados['idiomas'].remove(i)
+            print(f"dado removido {i}")
+    
+    # verifica se ha generos que nao serão usados
+    for i in dados_filtrados['generos']:
+        if generos.count(i)==0:
+            dados_filtrados['generos'].remove(i)
+            print(f"dado removido {i}")
     
     try: # tenta converter a nota
         dados_filtrados['avaliacao'] = float(dados_midia.get('imdbRating'))
+        dados_filtrados['valor'] = round(dados_filtrados['avaliacao']*10,2)
     except (ValueError, TypeError): # se não conseguir põe null
         dados_filtrados['avaliacao'] = None
+        dados_filtrados['valor'] = round(rdm.uniform(10.0,100.0),2)
     
     for d in dados_filtrados: # verifica se tem algum vetor com N/A colocador
         if isinstance(d,collections.abc.Sequence):
@@ -63,8 +87,8 @@ def filtrar_dados(dados_midia, tipo_midia):
 
     return dados_filtrados
 
+
 def ler_titulos_arquivo(nome_arquivo):
-    
     try:
         with open(nome_arquivo, 'r') as arquivo:
             return [linha.strip() for linha in arquivo.readlines()]

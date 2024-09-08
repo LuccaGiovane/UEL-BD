@@ -47,8 +47,8 @@ CREATE TABLE marketplace.midia (
 
     CONSTRAINT pk_midia PRIMARY KEY(id),
 	CONSTRAINT ck_filme_ou_serie CHECK(
-		((duracao=NULL) and (temporadas!=NULL)) or
-		((duracao!=NULL) and (temporadas=NULL))
+		((duracao IS NULL) AND (temporadas IS NOT NULL)) OR
+		((duracao IS NOT NULL) AND (temporadas IS NULL))
 	)
 );
 

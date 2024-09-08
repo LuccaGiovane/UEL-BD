@@ -2,7 +2,8 @@ package dto;
 
 import java.util.List;
 
-public class FilmeDTO {
+public class FilmeDTO
+{
     private String titulo;
     private String sinopse;
     private String poster;

@@ -1,16 +1,40 @@
-package controller;
+package com.marketplace.controller;
 
-import java.io.IOException;
-import org.json.JSONObject;
-import service.FilmeService;
+import com.marketplace.dto.FilmeDTO;
+import com.marketplace.service.FilmeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-public class FilmeController
-{
+import java.util.List;
 
-    private FilmeService filmeService = new FilmeService();
+@RestController
+@RequestMapping("/api/filmes")
+public class FilmeController {
 
-    public JSONObject buscarFilmePorNome(String nomeFilme) throws IOException
+    @Autowired
+    private FilmeService filmeService;
+
+    // endpoint que adiciona um filme via ajax
+    @PostMapping("/add")
+    public ResponseEntity<String> addFilme(@RequestBody FilmeDTO filme)
     {
-        return filmeService.getFilmeFromAPI(nomeFilme);
+        try
+        {
+            filmeService.inserirFilme(filme);
+            return ResponseEntity.ok("Filme adicionado com sucesso!");
+        } catch (Exception e)
+        {
+            return ResponseEntity.badRequest().body("Erro ao adicionar filme: " + e.getMessage());
+        }
+    }
+
+    // endpoint que lista os filmes via ajax
+    @GetMapping("/list")
+    public ResponseEntity<List<FilmeDTO>> listarFilmes()
+    {
+        List<FilmeDTO> filmes = filmeService.listarFilmes();
+
+        return ResponseEntity.ok(filmes);
     }
 }

@@ -13,30 +13,26 @@ CREATE TABLE marketplace.usuario (
     CONSTRAINT uk_usuario_login UNIQUE(login)
 );
 
--- novo tipo 'genero' para os generos dos filmes/series
-CREATE TYPE marketplace.GENERO AS ENUM (
-	'Action', 'Adventure', 'Animation', 'Biography', 
-	'Comedy', 'Crime', 'Documentary', 'Drama', 
-	'Family', 'Fantasy', 'Film-Noir', 'History', 
-	'Horror', 'Music', 'Musical', 'Mystery', 'Romance', 
-	'Sci-Fi', 'Short', 'Sport', 'Thriller', 'War', 'Western');
+CREATE TABLE marketplace.idioma(
+	id SERIAL,
+	idioma VARCHAR(24),
 
--- novo tipo 'idioma' para os idiomas dos filmes/series
-CREATE TYPE marketplace.IDIOMA AS ENUM (
-	'Arabic', 'Cantonese', 'Central Khmer', 
-	'Chinese', 'Cornish', 'Dutch', 'English', 
-	'French', 'Gaelic', 'German', 'Greek', 
-	'Hebrew', 'Hungarian', 'Italian', 'Japanese', 
-	'Korean', 'Mandarin', 'Polish', 'Portuguese', 
-	'Romanian', 'Russian', 'Spanish', 'Swedish', 'Thai', 
-	'Ukrainian', 'Vietnamese', 'Xhosa', 'Zulu');
+	CONSTRAINT pk_idioma PRIMARY KEY(id),
+	CONSTRAINT uk_idioma UNIQUE(idioma)
+);
+
+CREATE TABLE marketplace.genero(
+	id SERIAL,
+	genero VARCHAR(24),
+
+	CONSTRAINT pk_genero PRIMARY KEY(id),
+	CONSTRAINT uk_genero UNIQUE(genero)
+);
 
 CREATE TABLE marketplace.midia (
     id SERIAL,
     titulo VARCHAR(255) NOT NULL,
     sinopse TEXT,
-	idiomas marketplace.IDIOMA[],
-	generos marketplace.GENERO[],
     avaliacao DECIMAL(3, 2),
     poster VARCHAR(255),
     atores VARCHAR(255),
@@ -52,6 +48,27 @@ CREATE TABLE marketplace.midia (
 	)
 );
 
+CREATE TABLE marketplace.idiomas_da_midia(
+	midia_id INT,
+	idioma_id INT,
+
+	CONSTRAINT pk_idiomas_da_midia PRIMARY KEY(midia_id,idioma_id),
+	CONSTRAINT fk_midia_tem_idioma FOREIGN KEY(midia_id)
+		REFERENCES marketplace.midia(id),
+	CONSTRAINT fk_idioma_da_midia FOREIGN KEY(idioma_id)
+		REFERENCES 	marketplace.idioma(id)
+);
+
+CREATE TABLE marketplace.generos_da_midia(
+	midia_id INT,
+	genero_id INT,
+
+	CONSTRAINT pk_generos_da_midia PRIMARY KEY(midia_id,genero_id),
+	CONSTRAINT fk_midia_tem_genero FOREIGN KEY(midia_id)
+		REFERENCES marketplace.midia(id),
+	CONSTRAINT fk_genero_da_midia FOREIGN KEY(genero_id)
+		REFERENCES 	marketplace.genero(id)
+);
 
 CREATE TABLE marketplace.alugou (
     usuario_id INT,

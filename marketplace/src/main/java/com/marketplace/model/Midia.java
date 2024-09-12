@@ -1,9 +1,9 @@
-package com.marketplace.dto;
+package com.marketplace.model;
 
 import java.time.LocalDate;
 import java.util.List;
 
-public class FilmeDTO {
+public abstract class Midia {
     private String titulo;
     private String sinopse;
     private List<String> idiomas;
@@ -13,7 +13,6 @@ public class FilmeDTO {
     private String atores;
     private LocalDate dtLancamento;
     private double valor;
-    private int duracao;
 
     public String getTitulo() {
         return titulo;
@@ -85,13 +84,5 @@ public class FilmeDTO {
 
     public void setValor(double valor) {
         this.valor = avaliacao * 10;
-    }
-
-    public int getDuracao() {
-        return duracao;
-    }
-
-    public void setDuracao(int duracao) {
-        this.duracao = duracao;
     }
 }

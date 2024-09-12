@@ -16,3 +16,5 @@ insert into marketplace.generos_da_midia
 	(midia_id,genero_id) values (1,1);
 
 select * from marketplace.generos_da_midia;
+
+SELECT * FROM marketplace.midia WHERE (temporadas!=NULL);

@@ -2,11 +2,13 @@ package com.marketplace.dao;
 
 import com.marketplace.model.Midia;
 import com.marketplace.model.Serie;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
+@Repository
 public class SerieDAO extends MidiaDAO<Serie> {
 
     public void add(Serie serie) throws SQLException {

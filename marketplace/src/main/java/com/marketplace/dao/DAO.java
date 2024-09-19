@@ -8,7 +8,34 @@ public interface DAO<T> {
     String user = "postgres"; //System.getenv("DB_USER");
     String password = "csaewendy"; // System.getenv("DB_PASSWORD");
 
-    public abstract List<T> findAll() throws SQLException, ClassNotFoundException;
+    /**
+     * @author AllanSeidler
+     * @return Returna uma lista com todos os objetos T encontrados.
+     * @throws SQLException Problema na busca.
+    * */
+    List<T> findAll() throws SQLException;
 
-    public abstract void add(T object) throws SQLException;
+    /**
+     * @author AllanSeidler
+     * @param object Objeto da Classe T que será adicionado ao banco.
+     * @throws SQLException Problema na inserção.
+     */
+    void add(T object) throws SQLException;
+
+    /**
+     * @author AllanSeidler
+     * @param object Objeto da Classe T que será removida do banco.
+     * @throws SQLException Problema na remoção.
+     */
+    void delete(T object) throws SQLException;
+
+    /**
+     * @author AllanSeidler
+     * @param id Id do objeto sendo buscado.
+     * @return Returna o objeto sendo buscado. Caso não ache retorna null.
+     * @throws SQLException Erro na busca.
+     */
+    T findById(int id) throws SQLException;
+
+
 }

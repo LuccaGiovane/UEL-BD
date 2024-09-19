@@ -1,5 +1,10 @@
 insert into marketplace.midia (titulo,temporadas)
 	values ('One Piece',40);
+insert into marketplace.midia (titulo,temporadas)
+	values ('DBZ',3);
+insert into marketplace.midia (titulo,temporadas)
+	values ('Pokemon',20);
+
 
 insert into marketplace.genero (genero) values ('Fantasy');
 insert into marketplace.genero (genero) values ('Action');
@@ -17,4 +22,4 @@ insert into marketplace.generos_da_midia
 
 select * from marketplace.generos_da_midia;
 
-SELECT * FROM marketplace.midia WHERE (temporadas!=NULL);
+SELECT * FROM marketplace.midia;

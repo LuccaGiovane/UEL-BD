@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public abstract class MidiaDAO<M extends Midia> extends DAO<M> {
+public abstract class MidiaDAO<M extends Midia> implements DAO<M> {
 
     public void prepararCamposInserir(Connection conn, PreparedStatement stmt, Midia midia) throws SQLException {
         stmt.setString(1, midia.getTitulo());

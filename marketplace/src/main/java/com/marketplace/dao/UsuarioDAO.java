@@ -1,13 +1,14 @@
 package com.marketplace.dao;
 
-import com.marketplace.model.Filme;
 import com.marketplace.model.Usuario;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class UsuarioDAO extends DAO<Usuario> {
+@Repository
+public class UsuarioDAO implements DAO<Usuario> {
 
 
     @Override

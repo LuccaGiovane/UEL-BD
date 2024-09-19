@@ -10,4 +10,9 @@ public class Filme extends Midia {
     public void setDuracao(int duracao) {
         this.duracao = duracao;
     }
+
+    @Override
+    public String toString() {
+        return "Filme: "+this.getTitulo() + ", tempo: "+duracao;
+    }
 }

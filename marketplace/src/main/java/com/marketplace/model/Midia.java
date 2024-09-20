@@ -85,4 +85,5 @@ public abstract class Midia {
     public void setValor(double valor) {
         this.valor = avaliacao * 10;
     }
+
 }

@@ -30,12 +30,18 @@ public interface DAO<T> {
     void delete(T object) throws SQLException;
 
     /**
+     * @author lucca
+     * @param object Objeto da Classe T que será atualizado no banco.
+     * @throws SQLException Problema na atualização.
+     */
+    void update(T object) throws SQLException;
+
+    /**
      * @author AllanSeidler
      * @param id Id do objeto sendo buscado.
      * @return Returna o objeto sendo buscado. Caso não ache retorna null.
      * @throws SQLException Erro na busca.
      */
     T findById(int id) throws SQLException;
-
 
 }

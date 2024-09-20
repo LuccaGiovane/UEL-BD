@@ -2,6 +2,7 @@ package com.marketplace.model;
 
 public class Filme extends Midia {
 
+    private int id;
     private int duracao;
 
     public int getDuracao() {
@@ -11,8 +12,18 @@ public class Filme extends Midia {
         this.duracao = duracao;
     }
 
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "Filme: "+this.getTitulo() + ", tempo: "+duracao;
     }
+
 }

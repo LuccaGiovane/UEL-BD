@@ -32,6 +32,30 @@ public class FilmeController {
         }
     }
 
+    // endpoint que deleta um filme via ajax
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteFilme(@PathVariable int id) {
+        try {
+            //busca o filme
+            Filme filme = filmeDAO.findById(id);
+
+            //se der pau para encontrar o id
+            if (filme == null) {
+                return ResponseEntity.badRequest().body("Filme com id " + id + " não encontrado.");
+            }
+
+            //deleta o safado
+            filmeDAO.delete(filme);
+
+            return ResponseEntity.ok("Filme deletado com sucesso!");
+
+        } catch (SQLException e) {
+            // aqui lascou de vez
+            return ResponseEntity.badRequest().body("Erro ao deletar filme: " + e.getMessage());
+        }
+    }
+
+
     // endpoint que lista os filmes via ajax
     @GetMapping("/list-filmes")
     public void listarFilmes(HttpServletResponse response) throws IOException {
@@ -50,9 +74,28 @@ public class FilmeController {
         } catch (JsonIOException j) {
             System.out.println(j.getMessage());
             System.out.println("Erro de json");
+        }
+    }
 
+    //Endpoint que atualiza os filmes via Ajax
+    @PutMapping("/update-filme")
+    public ResponseEntity<String> updateFilme(@RequestBody Filme filme) {
+        try {
+            //vendo se o filme existe
+            Filme filmeExistente = filmeDAO.findById(filme.getId());
 
+            //se nao existir da erro
+            if (filmeExistente == null) {
+                return ResponseEntity.badRequest().body("Filme com id " + filme.getId() + " não encontrado.");
+            }
 
+            //att o filme
+            filmeDAO.update(filme);
+
+            return ResponseEntity.ok("Filme atualizado com sucesso!");
+
+        } catch (SQLException e) {
+            return ResponseEntity.badRequest().body("Erro ao atualizar filme: " + e.getMessage());
         }
     }
 

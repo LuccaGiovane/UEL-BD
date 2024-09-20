@@ -23,6 +23,20 @@ public class FilmeDAO extends MidiaDAO<Filme> {
         }
     }
 
+
+    @Override
+    public void delete(Filme filme) throws SQLException {
+        String deleteQuery = "DELETE FROM marketplace.midia WHERE id = ?";
+
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
+
+            stmt.setInt(1, filme.getId());
+            stmt.executeUpdate();
+        }
+    }
+
+
     @Override
     public List<Filme> findAll() throws SQLException {
         List<Filme> filmes = new LinkedList<>();
@@ -51,6 +65,51 @@ public class FilmeDAO extends MidiaDAO<Filme> {
 
         return filmes;
     }
+
+    @Override
+    public void update(Filme filme) throws SQLException {
+        String updateQuery = "UPDATE marketplace.midia SET titulo = ?, sinopse = ?, avaliacao = ?, " +
+                "poster = ?, atores = ?, dt_lancamento = ?, valor = ?, duracao = ? WHERE id = ?";
+
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
+
+            //prepara os campos para atualização
+            stmt.setString(1, filme.getTitulo());
+            stmt.setString(2, filme.getSinopse());
+            stmt.setDouble(3, filme.getAvaliacao());
+            stmt.setString(4, filme.getPoster());
+            stmt.setString(5, filme.getAtores());
+            stmt.setDate(6, Date.valueOf(filme.getDtLancamento()));
+            stmt.setDouble(7, filme.getValor());
+            stmt.setInt(8, filme.getDuracao());
+            stmt.setInt(9, filme.getId());
+
+            stmt.executeUpdate();
+        }
+    }
+
+    @Override
+    public Filme findById(int id) throws SQLException {
+
+        String query = "SELECT * FROM marketplace.midia WHERE id = ? AND duracao IS NOT NULL";
+        Filme filme = null;
+
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                filme = new Filme();
+                carregaDados(conn, rs, filme); //carrega os dados no objeto Filme
+            }
+        }
+
+        return filme; //se nao encontrar o filme retorna null mesmo
+    }
+
 
     @Override
     public void prepararCamposInserir(Connection conn, PreparedStatement stmt, Midia midia) throws SQLException {

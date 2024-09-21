@@ -16,7 +16,7 @@ public class UsuarioDAO implements DAO<Usuario> {
         List<Usuario> usuarios = new LinkedList<>();
         String query = "SELECT * FROM marketplace.usuario";
 
-        try (Connection conn = DriverManager.getConnection(url);
+        try (Connection conn = DriverManager.getConnection(url, user, password);
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
@@ -36,16 +36,18 @@ public class UsuarioDAO implements DAO<Usuario> {
 
     @Override
     public void add(Usuario usuario) throws SQLException {
-        String insertMidiaQuery = "INSERT INTO marketplace.usuario (nome, login, senha, nasc)" +
+        String insertUsuarioQuery = "INSERT INTO marketplace.usuario (nome, login, senha, nasc)" +
                 " VALUES (?, ?, ?, ?) RETURNING id";
 
-        try (Connection conn = DriverManager.getConnection(url)) {
-            PreparedStatement stmt = conn.prepareStatement(insertMidiaQuery);
+        try (Connection conn = DriverManager.getConnection(url, user, password)) {
+            PreparedStatement stmt = conn.prepareStatement(insertUsuarioQuery);
 
             stmt.setString(1, usuario.getNome());
             stmt.setString(2, usuario.getLogin());
             stmt.setString(3, usuario.getSenha());
             stmt.setDate(4, Date.valueOf(usuario.getNasc()));
+
+            stmt.executeQuery();
         }
     }
 
@@ -53,7 +55,7 @@ public class UsuarioDAO implements DAO<Usuario> {
     public void remove(Usuario usuario) throws SQLException {
         String deleteQuery = "DELETE FROM marketplace.usuario WHERE id = ?";
 
-        try (Connection conn = DriverManager.getConnection(url);
+        try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
 
             stmt.setInt(1, usuario.getId());
@@ -66,7 +68,7 @@ public class UsuarioDAO implements DAO<Usuario> {
         String updateQuery = "UPDATE marketplace.midia SET nome = ?, login = ?, senha = ?, " +
                 "nasc = ? WHERE id = ?";
 
-        try (Connection conn = DriverManager.getConnection(url)) {
+        try (Connection conn = DriverManager.getConnection(url, user, password)) {
             PreparedStatement stmt = conn.prepareStatement(updateQuery);
             stmt.setString(1, usuario.getNome());
             stmt.setString(2, usuario.getLogin());
@@ -80,10 +82,10 @@ public class UsuarioDAO implements DAO<Usuario> {
 
     @Override
     public Usuario findById(int id) throws SQLException {
-        String query = "SELECT * FROM marketplace.midia WHERE id = ? AND temporadas IS NOT NULL";
+        String query = "SELECT * FROM marketplace.midia WHERE id = ?";
         Usuario usuario = null;
 
-        try (Connection conn = DriverManager.getConnection(url)) {
+        try (Connection conn = DriverManager.getConnection(url, user, password)) {
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();

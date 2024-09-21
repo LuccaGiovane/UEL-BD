@@ -4,10 +4,19 @@ import java.time.LocalDate;
 import java.util.Date;
 
 public class Usuario {
+    private int id;
     private String nome;
     private String login;
     private String senha;
     private LocalDate nasc;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getNome() {
         return nome;
@@ -40,4 +49,5 @@ public class Usuario {
     public void setNasc(LocalDate nasc) {
         this.nasc = nasc;
     }
+
 }

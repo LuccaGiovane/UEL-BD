@@ -5,8 +5,8 @@ import java.util.List;
 
 public interface DAO<T> {
     String url = "jdbc:postgresql://localhost:5432/postgres?sslmode=prefer";
-    String user = "luqueta"; //System.getenv("DB_USER");
-    String password = "147532"; // System.getenv("DB_PASSWORD");
+    String user = "postgres"; //System.getenv("DB_USER");
+    String password = "csaewendy"; // System.getenv("DB_PASSWORD");
 
     /**
      * @author AllanSeidler
@@ -27,7 +27,7 @@ public interface DAO<T> {
      * @param object Objeto da Classe T que será removida do banco.
      * @throws SQLException Problema na remoção.
      */
-    void delete(T object) throws SQLException;
+    void remove(T object) throws SQLException;
 
     /**
      * @author lucca

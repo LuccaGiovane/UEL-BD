@@ -28,7 +28,21 @@ public abstract class MidiaDAO<M extends Midia> implements DAO<M> {
         }
     }
 
+    public void prepararCamposAtualizar(PreparedStatement stmt, Midia midia) throws SQLException {
+        stmt.setString(1, midia.getTitulo());
+        stmt.setString(2, midia.getSinopse());
+        stmt.setDouble(3, midia.getAvaliacao());
+        stmt.setString(4, midia.getPoster());
+        stmt.setString(5, midia.getAtores());
+        stmt.setDate(6, Date.valueOf(midia.getDtLancamento()));
+        stmt.setDouble(7, midia.getValor());
+        stmt.setInt(9, midia.getId());
+
+        stmt.executeUpdate();
+    }
+
     protected void carregaDados(Connection conn, ResultSet rs, Midia midia) throws SQLException {
+        midia.setId(rs.getInt("id"));
         midia.setTitulo(rs.getString("titulo"));
         midia.setSinopse(rs.getString("sinopse"));
         midia.setAvaliacao(rs.getDouble("avaliacao"));

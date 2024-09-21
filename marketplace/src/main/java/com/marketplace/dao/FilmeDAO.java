@@ -17,7 +17,7 @@ public class FilmeDAO extends MidiaDAO<Filme> {
                 "dt_lancamento, valor, duracao) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
 
 
-        try (Connection conn = DriverManager.getConnection(url)) {
+        try (Connection conn = DriverManager.getConnection(url, user, password)) {
             PreparedStatement stmt = conn.prepareStatement(insertMidiaQuery);
             prepararCamposInserir(conn,stmt,filme);
         }
@@ -25,7 +25,7 @@ public class FilmeDAO extends MidiaDAO<Filme> {
 
 
     @Override
-    public void delete(Filme filme) throws SQLException {
+    public void remove(Filme filme) throws SQLException {
         String deleteQuery = "DELETE FROM marketplace.midia WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(url, user, password);
@@ -43,7 +43,6 @@ public class FilmeDAO extends MidiaDAO<Filme> {
 //        Class.forName("com.postgre.jdbc.Driver");
 
         String query = "SELECT * FROM marketplace.midia WHERE(duracao IS NOT NULL)";
-        System.out.println("USUARIO: "+user+" SENHA: "+password+" BANCO: "+url);
 
         try {
             Connection conn = DriverManager.getConnection(url, user, password);
@@ -71,27 +70,15 @@ public class FilmeDAO extends MidiaDAO<Filme> {
         String updateQuery = "UPDATE marketplace.midia SET titulo = ?, sinopse = ?, avaliacao = ?, " +
                 "poster = ?, atores = ?, dt_lancamento = ?, valor = ?, duracao = ? WHERE id = ?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, password);
-             PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
-
-            //prepara os campos para atualização
-            stmt.setString(1, filme.getTitulo());
-            stmt.setString(2, filme.getSinopse());
-            stmt.setDouble(3, filme.getAvaliacao());
-            stmt.setString(4, filme.getPoster());
-            stmt.setString(5, filme.getAtores());
-            stmt.setDate(6, Date.valueOf(filme.getDtLancamento()));
-            stmt.setDouble(7, filme.getValor());
-            stmt.setInt(8, filme.getDuracao());
-            stmt.setInt(9, filme.getId());
-
+        try (Connection conn = DriverManager.getConnection(url, user, password)) {
+            PreparedStatement stmt = conn.prepareStatement(updateQuery);
+            prepararCamposAtualizar(stmt, filme);
             stmt.executeUpdate();
         }
     }
 
     @Override
     public Filme findById(int id) throws SQLException {
-
         String query = "SELECT * FROM marketplace.midia WHERE id = ? AND duracao IS NOT NULL";
         Filme filme = null;
 
@@ -115,6 +102,12 @@ public class FilmeDAO extends MidiaDAO<Filme> {
     public void prepararCamposInserir(Connection conn, PreparedStatement stmt, Midia midia) throws SQLException {
         stmt.setInt(8, ((Filme) midia).getDuracao());
         super.prepararCamposInserir(conn, stmt, midia);
+    }
+
+    @Override
+    public void prepararCamposAtualizar(PreparedStatement stmt, Midia midia) throws SQLException {
+        stmt.setInt(8, ((Filme) midia).getDuracao());
+        super.prepararCamposAtualizar(stmt, midia);
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public abstract class Midia {
+    private int id;
     private String titulo;
     private String sinopse;
     private List<String> idiomas;
@@ -13,6 +14,14 @@ public abstract class Midia {
     private String atores;
     private LocalDate dtLancamento;
     private double valor;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getTitulo() {
         return titulo;
@@ -83,7 +92,26 @@ public abstract class Midia {
     }
 
     public void setValor(double valor) {
-        this.valor = avaliacao * 10;
+        if(valor<=0)
+            this.valor = avaliacao * 10;
+        else {
+            this.valor = valor;
+        }
     }
 
+    @Override
+    public String toString() {
+        return "Midia{" +
+                "id=" + id +
+                ", titulo='" + titulo + '\'' +
+                ", sinopse='" + sinopse + '\'' +
+                ", idiomas=" + idiomas +
+                ", generos=" + generos +
+                ", avaliacao=" + avaliacao +
+                ", poster='" + poster + '\'' +
+                ", atores='" + atores + '\'' +
+                ", dtLancamento=" + dtLancamento +
+                ", valor=" + valor +
+                '}';
+    }
 }

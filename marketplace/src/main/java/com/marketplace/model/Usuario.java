@@ -10,6 +10,7 @@ public class Usuario {
     private String senha;
     private LocalDate nasc;
 
+
     public int getId() {
         return id;
     }
@@ -50,4 +51,14 @@ public class Usuario {
         this.nasc = nasc;
     }
 
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", login='" + login + '\'' +
+                ", senha='" + senha + '\'' +
+                ", nasc=" + nasc +
+                '}';
+    }
 }

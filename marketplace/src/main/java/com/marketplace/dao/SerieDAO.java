@@ -21,7 +21,7 @@ public class SerieDAO extends MidiaDAO<Serie> {
         }
     }
     public List<Serie> findAll() throws SQLException {
-        String query = "SELECT * FROM marketplace.midia WHERE (temporadas IS NOT NULL)";
+        String query = "SELECT * FROM marketplace.midia WHERE (temporadas IS NOT NULL AND ativo=TRUE)";
         List<Serie> series = new LinkedList<>();
 
         try (Connection conn = DriverManager.getConnection(url, user, password);
@@ -39,7 +39,7 @@ public class SerieDAO extends MidiaDAO<Serie> {
 
     @Override
     public void remove(Serie serie) throws SQLException {
-        String deleteQuery = "DELETE FROM marketplace.midia WHERE id = ?";
+        String deleteQuery = "UPDATE marketplace.midia SET ativo=FALSE WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
@@ -53,7 +53,7 @@ public class SerieDAO extends MidiaDAO<Serie> {
     public void update(Serie serie) throws SQLException {
         String updateQuery = "UPDATE marketplace.midia SET titulo = ?, sinopse = ?, avaliacao = ?, " +
                 "poster = ?, atores = ?, dt_lancamento = ?, valor = ?, temporadas = ?" +
-                " WHERE id = ?";
+                " WHERE id = ? AND ativo=TRUE";
 
         try (Connection conn = DriverManager.getConnection(url, user, password)) {
             PreparedStatement stmt = conn.prepareStatement(updateQuery);
@@ -65,7 +65,7 @@ public class SerieDAO extends MidiaDAO<Serie> {
     @Override
     public Serie findById(int id) throws SQLException {
 
-        String query = "SELECT * FROM marketplace.midia WHERE id = ? AND temporadas IS NOT NULL";
+        String query = "SELECT * FROM marketplace.midia WHERE id = ? AND temporadas IS NOT NULL AND ativo=TRUE";
         Serie serie = null;
 
         try (Connection conn = DriverManager.getConnection(url, user, password);

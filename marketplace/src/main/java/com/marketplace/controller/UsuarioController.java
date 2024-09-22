@@ -42,7 +42,6 @@ public class UsuarioController {
             else usuarioDAO.remove(usuario);
 
             return ResponseEntity.ok("Usuario deletado com sucesso!");
-
         } catch (SQLException e) {
             return ResponseEntity.ok("Erro ao deletar usuario: "+ e.getMessage());
         }

@@ -14,7 +14,7 @@ public class UsuarioDAO implements DAO<Usuario> {
     @Override
     public List<Usuario> findAll() throws SQLException {
         List<Usuario> usuarios = new LinkedList<>();
-        String query = "SELECT * FROM marketplace.usuario";
+        String query = "SELECT * FROM marketplace.usuario WHERE ativo=TRUE";
 
         try (Connection conn = DriverManager.getConnection(url, user, password);
              Statement stmt = conn.createStatement();
@@ -53,11 +53,11 @@ public class UsuarioDAO implements DAO<Usuario> {
 
     @Override
     public void remove(Usuario usuario) throws SQLException {
-        String deleteQuery = "DELETE FROM marketplace.usuario WHERE id = ?";
+        String deleteQuery = "UPDATE marketplace.usuario SET ativo=FALSE WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
-
+            System.out.println(usuario.getId());
             stmt.setInt(1, usuario.getId());
             stmt.executeUpdate();
         }
@@ -65,8 +65,8 @@ public class UsuarioDAO implements DAO<Usuario> {
 
     @Override
     public void update(Usuario usuario) throws SQLException {
-        String updateQuery = "UPDATE marketplace.midia SET nome = ?, login = ?, senha = ?, " +
-                "nasc = ? WHERE id = ?";
+        String updateQuery = "UPDATE marketplace.usuario SET nome = ?, login = ?, senha = ?, " +
+                "nasc = ? WHERE id = ? AND ativo=TRUE";
 
         try (Connection conn = DriverManager.getConnection(url, user, password)) {
             PreparedStatement stmt = conn.prepareStatement(updateQuery);
@@ -82,7 +82,7 @@ public class UsuarioDAO implements DAO<Usuario> {
 
     @Override
     public Usuario findById(int id) throws SQLException {
-        String query = "SELECT * FROM marketplace.midia WHERE id = ?";
+        String query = "SELECT * FROM marketplace.usuario WHERE id = ? AND ativo=TRUE";
         Usuario usuario = null;
 
         try (Connection conn = DriverManager.getConnection(url, user, password)) {

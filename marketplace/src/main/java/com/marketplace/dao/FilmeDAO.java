@@ -26,7 +26,7 @@ public class FilmeDAO extends MidiaDAO<Filme> {
 
     @Override
     public void remove(Filme filme) throws SQLException {
-        String deleteQuery = "DELETE FROM marketplace.midia WHERE id = ?";
+        String deleteQuery = "UPDATE marketplace.midia SET ativo=FALSE WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
@@ -42,7 +42,7 @@ public class FilmeDAO extends MidiaDAO<Filme> {
         List<Filme> filmes = new LinkedList<>();
 //        Class.forName("com.postgre.jdbc.Driver");
 
-        String query = "SELECT * FROM marketplace.midia WHERE(duracao IS NOT NULL)";
+        String query = "SELECT * FROM marketplace.midia WHERE(duracao IS NOT NULL AND ativo=TRUE)";
 
         try {
             Connection conn = DriverManager.getConnection(url, user, password);
@@ -68,7 +68,7 @@ public class FilmeDAO extends MidiaDAO<Filme> {
     @Override
     public void update(Filme filme) throws SQLException {
         String updateQuery = "UPDATE marketplace.midia SET titulo = ?, sinopse = ?, avaliacao = ?, " +
-                "poster = ?, atores = ?, dt_lancamento = ?, valor = ?, duracao = ? WHERE id = ?";
+                "poster = ?, atores = ?, dt_lancamento = ?, valor = ?, duracao = ? WHERE id = ? AND ativo=TRUE";
 
         try (Connection conn = DriverManager.getConnection(url, user, password)) {
             PreparedStatement stmt = conn.prepareStatement(updateQuery);
@@ -79,7 +79,7 @@ public class FilmeDAO extends MidiaDAO<Filme> {
 
     @Override
     public Filme findById(int id) throws SQLException {
-        String query = "SELECT * FROM marketplace.midia WHERE id = ? AND duracao IS NOT NULL";
+        String query = "SELECT * FROM marketplace.midia WHERE id = ? AND duracao IS NOT NULL AND ativo=TRUE";
         Filme filme = null;
 
         try (Connection conn = DriverManager.getConnection(url, user, password);

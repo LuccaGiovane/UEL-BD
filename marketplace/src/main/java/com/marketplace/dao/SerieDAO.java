@@ -12,7 +12,7 @@ import java.util.List;
 public class SerieDAO extends MidiaDAO<Serie> {
     public void add(Serie serie) throws SQLException {
         String insertQuery = "INSERT INTO marketplace.midia (titulo, sinopse, avaliacao, poster, atores, " +
-                "dt_lancamento, valor, duracao) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
+                "dt_lancamento, valor, temporadas) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
 
         try (Connection conn = DriverManager.getConnection(url, user, password)) {
             PreparedStatement stmt = conn.prepareStatement(insertQuery);

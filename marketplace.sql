@@ -36,7 +36,7 @@ CREATE TABLE marketplace.midia (
     avaliacao DECIMAL(3, 2),
     poster VARCHAR(255),
     atores VARCHAR(255),
-    dt_lancamento DATE,
+    dt_lancamento DATE NOT NULL,
     valor DECIMAL(10, 2),
 	duracao INT, -- Exclusivo de filme
 	temporadas INT, -- Exclusivo de serie

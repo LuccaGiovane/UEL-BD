@@ -27,6 +27,7 @@ public class SerieController {
             return ResponseEntity.ok("Serie adicionado com sucesso!");
 
         } catch (SQLException e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body("Erro ao adicionar serie: " + e.getMessage());
         }
     }

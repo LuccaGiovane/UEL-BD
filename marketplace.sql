@@ -15,7 +15,7 @@ CREATE TABLE marketplace.usuario (
 
 CREATE TABLE marketplace.idioma(
 	id SERIAL,
-	idioma VARCHAR(24),
+	idioma VARCHAR(24) NOT NULL,
 
 	CONSTRAINT pk_idioma PRIMARY KEY(id),
 	CONSTRAINT uk_idioma UNIQUE(idioma)
@@ -23,7 +23,7 @@ CREATE TABLE marketplace.idioma(
 
 CREATE TABLE marketplace.genero(
 	id SERIAL,
-	genero VARCHAR(24),
+	genero VARCHAR(24) NOT NULL,
 
 	CONSTRAINT pk_genero PRIMARY KEY(id),
 	CONSTRAINT uk_genero UNIQUE(genero)
@@ -37,7 +37,11 @@ CREATE TABLE marketplace.midia (
     poster VARCHAR(255),
     atores VARCHAR(255),
     dt_lancamento DATE NOT NULL,
+<<<<<<< Updated upstream
     valor DECIMAL(10, 2),
+=======
+    valor DECIMAL(10, 2) NOT NULL,
+>>>>>>> Stashed changes
 	duracao INT, -- Exclusivo de filme
 	temporadas INT, -- Exclusivo de serie
 

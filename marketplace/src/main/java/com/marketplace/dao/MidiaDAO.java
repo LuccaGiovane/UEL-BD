@@ -91,10 +91,8 @@ public abstract class MidiaDAO<M extends Midia> implements DAO<M> {
             for (String genero : generos) {
                 stmtFind.setString(1, genero);
                 ResultSet rs = stmtFind.executeQuery();
-
                 if (rs.next()) {
                     int generoId = rs.getInt("id");
-
                     stmtInsert.setInt(1, midiaId);
                     stmtInsert.setInt(2, generoId);
                     stmtInsert.addBatch();

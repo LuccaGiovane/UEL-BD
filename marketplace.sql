@@ -4,10 +4,11 @@ CREATE SCHEMA marketplace;
 
 CREATE TABLE marketplace.usuario (
     id SERIAL,
-    nome VARCHAR(255),
+    nome VARCHAR(255) NOT NULL,
     login VARCHAR(255) NOT NULL,
     senha VARCHAR(255) NOT NULL,
-    nasc DATE,
+    nasc DATE NOT NULL,
+	ativo BOOLEAN DEFAULT TRUE,
 
     CONSTRAINT pk_usuario PRIMARY KEY(id),
     CONSTRAINT uk_usuario_login UNIQUE(login)
@@ -37,13 +38,10 @@ CREATE TABLE marketplace.midia (
     poster VARCHAR(255),
     atores VARCHAR(255),
     dt_lancamento DATE NOT NULL,
-<<<<<<< Updated upstream
-    valor DECIMAL(10, 2),
-=======
     valor DECIMAL(10, 2) NOT NULL,
->>>>>>> Stashed changes
 	duracao INT, -- Exclusivo de filme
 	temporadas INT, -- Exclusivo de serie
+	ativo BOOLEAN DEFAULT TRUE,
 
     CONSTRAINT pk_midia PRIMARY KEY(id),
 	CONSTRAINT ck_filme_ou_serie CHECK(

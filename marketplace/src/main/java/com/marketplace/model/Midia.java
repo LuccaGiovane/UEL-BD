@@ -15,6 +15,7 @@ public abstract class Midia {
     private LocalDate dtLancamento;
     private double valor;
 
+
     public int getId() {
         return id;
     }

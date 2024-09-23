@@ -41,7 +41,7 @@ public class SerieController {
 
             if (serie == null) //se der pau para encontrar o id
                 return ResponseEntity.ok("Serie não encontrado!");
-                //deleta o safado
+
             else serieDAO.remove(serie);
 
             return ResponseEntity.ok("Serie deletado com sucesso!");

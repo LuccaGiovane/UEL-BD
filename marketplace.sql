@@ -1,4 +1,4 @@
--- drop schema marketplace cascade;
+drop schema marketplace cascade;
 
 CREATE SCHEMA marketplace;
 
@@ -9,9 +9,12 @@ CREATE TABLE marketplace.usuario (
     senha VARCHAR(255) NOT NULL,
     nasc DATE NOT NULL,
 	ativo BOOLEAN DEFAULT TRUE,
+	saldo DECIMAL(10,2),
 
     CONSTRAINT pk_usuario PRIMARY KEY(id),
-    CONSTRAINT uk_usuario_login UNIQUE(login)
+    CONSTRAINT uk_usuario_login UNIQUE(login),
+	
+	CONSTRAINT ck_saldo CHECK (saldo>=0.00)
 );
 
 CREATE TABLE marketplace.idioma(
@@ -72,29 +75,42 @@ CREATE TABLE marketplace.generos_da_midia(
 		REFERENCES 	marketplace.genero(id)
 );
 
-CREATE TABLE marketplace.alugou (
-    usuario_id INT,
-    midia_id INT,
-    dt_inicio DATE NOT NULL,
-    dt_expira DATE NOT NULL,
-    
-    CONSTRAINT pk_alugou PRIMARY KEY (usuario_id, midia_id, dt_inicio),
-    CONSTRAINT fk_usuario_alugou FOREIGN KEY (usuario_id) 
-		REFERENCES marketplace.usuario(id),
-    CONSTRAINT fk_midia_foi_alugada FOREIGN KEY (midia_id) 
-		REFERENCES marketplace.midia(id),
-    CONSTRAINT ck_dt_aluguel CHECK(dt_inicio < dt_expira)
+CREATE TABLE marketplace.nota_fiscal(
+	usuario_id INT,
+	valor_total DECIMAL(10, 2) NOT NULL,
+	dt_pagamento TIMESTAMP DEFAULT(NOW()),
+
+	CONSTRAINT pk_nota_fiscal PRIMARY KEY (usuario_id, dt_pagamento),
+	CONSTRAINT fk_usuario_possui FOREIGN KEY(usuario_id)
+		REFERENCES marketplace.usuario(id)
 );
 
-CREATE TABLE marketplace.comprou (
+CREATE TABLE marketplace.aluguel (
     usuario_id INT,
     midia_id INT,
-    dt_compra DATE NOT NULL,
+	dt_inicio TIMESTAMP,
+    dt_expira TIMESTAMP NOT NULL, --DEFAULT(dt_inicio + INTERVAL '30 days') NOT NULL, 
+	valor DECIMAL(10, 2) NOT NULL,
+    
+    CONSTRAINT pk_aluguel PRIMARY KEY (usuario_id, midia_id, dt_inicio),
+    CONSTRAINT fk_usuario_alugou FOREIGN KEY (usuario_id, dt_inicio)
+		REFERENCES marketplace.nota_fiscal(usuario_id, dt_pagamento),
+    CONSTRAINT fk_midia_foi_alugada FOREIGN KEY (midia_id)
+		REFERENCES marketplace.midia(id),
+    CONSTRAINT ck_dt_aluguel CHECK(dt_inicio < dt_expira),
+	CONSTRAINT ck_valor_compra_positivo CHECK (valor>0.00)
+);
+
+CREATE TABLE marketplace.compra (
+    usuario_id INT,
+    midia_id INT,
+	dt_compra TIMESTAMP,
+	valor DECIMAL(10, 2) NOT NULL,
 
     CONSTRAINT pk_comprou PRIMARY KEY (usuario_id, midia_id),
-    CONSTRAINT fk_usuario_comprou FOREIGN KEY (usuario_id) 
-		REFERENCES marketplace.usuario(id),
+    CONSTRAINT fk_usuario_comprou FOREIGN KEY (usuario_id, dt_compra)
+		REFERENCES marketplace.nota_fiscal(usuario_id,dt_pagamento),
     CONSTRAINT fk_midia_foi_comprada FOREIGN KEY (midia_id) 
-		REFERENCES marketplace.midia(id)
+		REFERENCES marketplace.midia(id),
+	CONSTRAINT ck_valor_compra_positivo CHECK (valor>0.00)
 );
-

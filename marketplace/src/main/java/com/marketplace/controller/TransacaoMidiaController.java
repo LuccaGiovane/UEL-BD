@@ -20,7 +20,7 @@ public class TransacaoMidiaController {
     public ResponseEntity<String> comprarMidia(@RequestParam int usuarioId,
                                                @RequestParam int midiaId) {
         try {
-            transacaoMidiaDAO.comprarMidia(usuarioId, midiaId, java.time.LocalDate.now());
+            transacaoMidiaDAO.comprarMidia(usuarioId, midiaId, java.time.LocalDateTime.now());
             return ResponseEntity.ok("Mídia comprada com sucesso!");
 
         } catch (SQLException e) {
@@ -28,27 +28,20 @@ public class TransacaoMidiaController {
         }
     }
 
-    // endpoint para registrar o aluguel de uma midia (filme ou série)
+
+    // Endpoint para registrar o aluguel de uma mídia (filme ou série)
     @PostMapping("/alugar-midia")
     public ResponseEntity<String> alugarMidia(@RequestParam int usuarioId,
-                                              @RequestParam int midiaId,
-                                              @RequestParam String dataExpira) {
+                                              @RequestParam int midiaId) {
         try {
-
-            java.time.LocalDate dataInicio = java.time.LocalDate.now();
-            java.time.LocalDate dataExpiracao = java.time.LocalDate.parse(dataExpira);
-
-            if (dataInicio.isAfter(dataExpiracao)) {
-                return ResponseEntity.badRequest().body("Data de expiração não pode ser anterior à data de início.");
-            }
-
-            transacaoMidiaDAO.alugarMidia(usuarioId, midiaId, dataInicio, dataExpiracao);
+            transacaoMidiaDAO.alugarMidia(usuarioId, midiaId);
             return ResponseEntity.ok("Mídia alugada com sucesso!");
 
         } catch (SQLException e) {
             return ResponseEntity.badRequest().body("Erro ao registrar aluguel: " + e.getMessage());
         }
     }
+
 
     // endpoint para listar compras por usuario
     @GetMapping("/listar-compras-usuario")

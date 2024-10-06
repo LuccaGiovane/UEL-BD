@@ -15,13 +15,12 @@ public class TransacaoMidiaController {
 
     private final TransacaoMidiaDAO transacaoMidiaDAO = new TransacaoMidiaDAO();
 
-    // endpoint para registrar a compra de uma midia (filme ou série)
     @PostMapping("/comprar-midia")
     public ResponseEntity<String> comprarMidia(@RequestParam int usuarioId,
-                                               @RequestParam int midiaId) {
+                                               @RequestParam List<Integer> midiaIds) {
         try {
-            transacaoMidiaDAO.comprarMidia(usuarioId, midiaId, java.time.LocalDateTime.now());
-            return ResponseEntity.ok("Mídia comprada com sucesso!");
+            transacaoMidiaDAO.comprarMidias(usuarioId, midiaIds);
+            return ResponseEntity.ok("Mídias compradas com sucesso!");
 
         } catch (SQLException e) {
             return ResponseEntity.badRequest().body("Erro ao registrar compra: " + e.getMessage());
@@ -31,16 +30,17 @@ public class TransacaoMidiaController {
 
     // Endpoint para registrar o aluguel de uma mídia (filme ou série)
     @PostMapping("/alugar-midia")
-    public ResponseEntity<String> alugarMidia(@RequestParam int usuarioId,
-                                              @RequestParam int midiaId) {
+    public ResponseEntity<String> alugarMidias(@RequestParam int usuarioId,
+                                               @RequestParam List<Integer> midiaIds) {
         try {
-            transacaoMidiaDAO.alugarMidia(usuarioId, midiaId);
-            return ResponseEntity.ok("Mídia alugada com sucesso!");
+            transacaoMidiaDAO.alugarMidias(usuarioId, midiaIds);
+            return ResponseEntity.ok("Mídias alugadas com sucesso!");
 
         } catch (SQLException e) {
             return ResponseEntity.badRequest().body("Erro ao registrar aluguel: " + e.getMessage());
         }
     }
+
 
 
     // endpoint para listar compras por usuario

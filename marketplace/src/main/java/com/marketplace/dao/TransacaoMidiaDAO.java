@@ -35,113 +35,203 @@ public class TransacaoMidiaDAO {
     }
 
 
-    // Método para registrar compra de uma mídia (filme ou série)
-    public void comprarMidia(int usuarioId, int midiaId, LocalDateTime dataCompra) throws SQLException {
+    // Método para registrar a compra de várias mídias
+    public void comprarMidias(int usuarioId, List<Integer> midiaIds) throws SQLException {
 
-        //consulta o valor da midia
+        // Variável para somar o valor total das mídias
+        double valorTotal = 0;
+
+        // Consulta para buscar o valor de cada mídia
         String buscarValorMidiaQuery = "SELECT valor FROM marketplace.midia WHERE id = ?";
-        double valorMidia = 0;
 
-        try (Connection conn = DriverManager.getConnection(url, user, password);
-             PreparedStatement stmt = conn.prepareStatement(buscarValorMidiaQuery)) {
-            stmt.setInt(1, midiaId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    valorMidia = rs.getDouble("valor");
-                } else {
-                    throw new SQLException("Mídia não encontrada.");
+        // Consulta para verificar se a mídia já foi comprada pelo usuário
+        String verificarCompraQuery = "SELECT 1 FROM marketplace.compra WHERE usuario_id = ? AND midia_id = ?";
+
+        try (Connection conn = DriverManager.getConnection(url, user, password)) {
+            conn.setAutoCommit(false);  // Iniciar a transação
+
+            try (PreparedStatement buscarValorStmt = conn.prepareStatement(buscarValorMidiaQuery)) {
+
+                for (int midiaId : midiaIds) {
+                    // Para cada mídia, verificar se já foi comprada
+                    try (PreparedStatement verificarCompraStmt = conn.prepareStatement(verificarCompraQuery)) {
+                        verificarCompraStmt.setInt(1, usuarioId);
+                        verificarCompraStmt.setInt(2, midiaId);
+
+                        try (ResultSet rsVerificar = verificarCompraStmt.executeQuery()) {
+                            if (rsVerificar.next()) {
+                                // O usuário já comprou esta mídia, então ignoramos
+                                continue;
+                            }
+                        }
+                    }
+
+                    // Buscar o valor da mídia se ainda não foi comprada
+                    buscarValorStmt.setInt(1, midiaId);
+                    try (ResultSet rs = buscarValorStmt.executeQuery()) {
+                        if (rs.next()) {
+                            // Somar o valor da mídia ao total
+                            valorTotal += rs.getDouble("valor");
+                        } else {
+                            throw new SQLException("Mídia não encontrada: " + midiaId);
+                        }
+                    }
                 }
             }
-        }
 
-        //cria a nota fiscal e pega a data de pagamento
-        LocalDateTime dtPagamento = criarNotaFiscal(usuarioId, valorMidia);
+            // Se não houver valor total (nenhuma mídia nova para comprar), não continuar
+            if (valorTotal == 0) {
+                throw new SQLException("Nenhuma mídia nova para comprar.");
+            }
 
-        String compraMidiaQuery = "INSERT INTO marketplace.compra (usuario_id, midia_id, dt_compra, valor) " +
-                "VALUES (?, ?, ?, ?)";
+            // Criar uma nota fiscal com o valor total
+            LocalDateTime dtPagamento = criarNotaFiscal(usuarioId, valorTotal);
 
-        try (Connection conn = DriverManager.getConnection(url, user, password);
-             PreparedStatement stmt = conn.prepareStatement(compraMidiaQuery)) {
-            stmt.setInt(1, usuarioId);
-            stmt.setInt(2, midiaId);
-            stmt.setTimestamp(3, Timestamp.valueOf(dtPagamento)); //usa a dt_pagamento retornada
-            stmt.setDouble(4, valorMidia);
-            stmt.executeUpdate();
+            // Inserir as compras de cada mídia
+            String compraMidiaQuery = "INSERT INTO marketplace.compra (usuario_id, midia_id, dt_compra, valor) " +
+                    "VALUES (?, ?, ?, ?)";
+
+            try (PreparedStatement compraStmt = conn.prepareStatement(compraMidiaQuery)) {
+                for (int midiaId : midiaIds) {
+                    // Verificar novamente se o usuário já comprou a mídia antes de tentar inserir
+                    try (PreparedStatement verificarCompraStmt = conn.prepareStatement(verificarCompraQuery)) {
+                        verificarCompraStmt.setInt(1, usuarioId);
+                        verificarCompraStmt.setInt(2, midiaId);
+
+                        try (ResultSet rsVerificar = verificarCompraStmt.executeQuery()) {
+                            if (rsVerificar.next()) {
+                                // O usuário já comprou esta mídia, então ignoramos
+                                continue;
+                            }
+                        }
+                    }
+
+                    // Inserir a compra da mídia se não foi comprada antes
+                    compraStmt.setInt(1, usuarioId);
+                    compraStmt.setInt(2, midiaId);
+                    compraStmt.setTimestamp(3, Timestamp.valueOf(dtPagamento));  // Usar a mesma dt_pagamento para todas
+                    compraStmt.setDouble(4, valorTotal);  // Valor da mídia
+                    compraStmt.executeUpdate();
+                }
+            }
+
+            conn.commit();  // Commit da transação
+        } catch (SQLException e) {
+            // Rollback em caso de erro
+            throw new SQLException("Erro ao registrar compra: " + e.getMessage());
         }
     }
 
 
-    // Método para registrar aluguel de uma mídia (filme ou série)
-    public void alugarMidia(int usuarioId, int midiaId) throws SQLException {
 
-        //busca no banco o valor da midia
+    // Método para registrar o aluguel de várias mídias
+    public void alugarMidias(int usuarioId, List<Integer> midiaIds) throws SQLException {
+
+        // Consulta para buscar o valor de cada mídia
         String buscarValorMidiaQuery = "SELECT valor FROM marketplace.midia WHERE id = ?";
-        double valorMidia = 0;
 
-        try (Connection conn = DriverManager.getConnection(url, user, password);
-             PreparedStatement stmt = conn.prepareStatement(buscarValorMidiaQuery)) {
-            stmt.setInt(1, midiaId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    valorMidia = rs.getDouble("valor");
-                } else {
-                    throw new SQLException("Mídia não encontrada.");
-                }
-            }
-        }
+        // Consulta para verificar se a mídia já foi comprada pelo usuário
+        String verificarCompraQuery = "SELECT 1 FROM marketplace.compra WHERE usuario_id = ? AND midia_id = ?";
 
-        //cria a nota fiscal e obtem a data de pagamento
-        LocalDateTime dtPagamento = criarNotaFiscal(usuarioId, valorMidia); // Retorna a data de pagamento
-
-
+        // Consulta para verificar se já existe um aluguel ativo para a mídia
         String verificarAluguelQuery = "SELECT dt_expira FROM marketplace.aluguel " +
-                "WHERE usuario_id = ? AND midia_id = ? " +
-                "AND dt_expira > NOW()";
+                "WHERE usuario_id = ? AND midia_id = ? AND dt_expira > NOW()";
 
-        // aqui é caso exista um aluguel da mesma midia ativa
+        // Query para atualizar o aluguel se já estiver ativo
         String atualizarAluguelQuery = "UPDATE marketplace.aluguel " +
                 "SET dt_expira = dt_expira + INTERVAL '30 days' " +
                 "WHERE usuario_id = ? AND midia_id = ?";
 
-        //caso nao existe nenhum aluguel ATIVO da midia em uestao
+        // Query para criar um novo aluguel
         String novoAluguelQuery = "INSERT INTO marketplace.aluguel (usuario_id, midia_id, dt_inicio, dt_expira, valor) " +
                 "VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(url, user, password)) {
-            conn.setAutoCommit(false);  // Começar transação
+            conn.setAutoCommit(false);  // Iniciar transação
 
-            try (PreparedStatement verificarStmt = conn.prepareStatement(verificarAluguelQuery)) {
-                verificarStmt.setInt(1, usuarioId);
-                verificarStmt.setInt(2, midiaId);
+            double valorTotal = 0;  // Variável para somar o valor total das mídias
 
-                ResultSet rs = verificarStmt.executeQuery();
+            // Preparar consultas
+            try (PreparedStatement buscarValorStmt = conn.prepareStatement(buscarValorMidiaQuery);
+                 PreparedStatement verificarCompraStmt = conn.prepareStatement(verificarCompraQuery);
+                 PreparedStatement verificarAluguelStmt = conn.prepareStatement(verificarAluguelQuery);
+                 PreparedStatement atualizarAluguelStmt = conn.prepareStatement(atualizarAluguelQuery);
+                 PreparedStatement novoAluguelStmt = conn.prepareStatement(novoAluguelQuery)) {
 
-                if (rs.next()) {
-                    //existe um aluguel ativo, entao estende o prazo de duração
-                    try (PreparedStatement atualizarStmt = conn.prepareStatement(atualizarAluguelQuery)) {
-                        atualizarStmt.setInt(1, usuarioId);
-                        atualizarStmt.setInt(2, midiaId);
-                        atualizarStmt.executeUpdate();
+                for (int midiaId : midiaIds) {
+
+                    // Verificar se o usuário já comprou a mídia
+                    verificarCompraStmt.setInt(1, usuarioId);
+                    verificarCompraStmt.setInt(2, midiaId);
+                    try (ResultSet rsCompra = verificarCompraStmt.executeQuery()) {
+                        if (rsCompra.next()) {
+                            // O usuário já comprou esta mídia, então ignoramos o aluguel
+                            continue;
+                        }
                     }
-                } else {
-                    //nao existe aluguel ativo, então cria um novo
-                    try (PreparedStatement novoAluguelStmt = conn.prepareStatement(novoAluguelQuery)) {
-                        novoAluguelStmt.setInt(1, usuarioId);
-                        novoAluguelStmt.setInt(2, midiaId);
-                        novoAluguelStmt.setTimestamp(3, Timestamp.valueOf(dtPagamento)); // Usar dt_pagamento como dt_inicio
-                        novoAluguelStmt.setTimestamp(4, Timestamp.valueOf(dtPagamento.plusDays(30))); // Expiração 30 dias depois
-                        novoAluguelStmt.setDouble(5, valorMidia);
-                        novoAluguelStmt.executeUpdate();
+
+                    // Buscar o valor da mídia
+                    buscarValorStmt.setInt(1, midiaId);
+                    double valorMidia;
+                    try (ResultSet rsValor = buscarValorStmt.executeQuery()) {
+                        if (rsValor.next()) {
+                            valorMidia = rsValor.getDouble("valor");
+                            valorTotal += valorMidia;  // Somar ao valor total
+                        } else {
+                            throw new SQLException("Mídia não encontrada: " + midiaId);
+                        }
                     }
                 }
 
-                conn.commit();  // Finalizar transação
+                // Se o valor total for 0, significa que todas as mídias foram ignoradas (compradas anteriormente)
+                if (valorTotal == 0) {
+                    throw new SQLException("Nenhuma mídia válida para alugar.");
+                }
+
+                // Criar uma única nota fiscal com o valor total das mídias
+                LocalDateTime dtPagamento = criarNotaFiscal(usuarioId, valorTotal);
+
+                // Agora, inserir os aluguéis para cada mídia
+                for (int midiaId : midiaIds) {
+                    // Verificar novamente se o usuário já comprou a mídia
+                    verificarCompraStmt.setInt(1, usuarioId);
+                    verificarCompraStmt.setInt(2, midiaId);
+                    try (ResultSet rsCompra = verificarCompraStmt.executeQuery()) {
+                        if (rsCompra.next()) {
+                            // Ignorar se já comprada
+                            continue;
+                        }
+                    }
+
+                    // Verificar se já existe um aluguel ativo
+                    verificarAluguelStmt.setInt(1, usuarioId);
+                    verificarAluguelStmt.setInt(2, midiaId);
+                    try (ResultSet rsAluguel = verificarAluguelStmt.executeQuery()) {
+                        if (rsAluguel.next()) {
+                            // Existe um aluguel ativo, então estendemos o prazo de duração
+                            atualizarAluguelStmt.setInt(1, usuarioId);
+                            atualizarAluguelStmt.setInt(2, midiaId);
+                            atualizarAluguelStmt.executeUpdate();
+                        } else {
+                            // Não existe aluguel ativo, então criamos um novo
+                            novoAluguelStmt.setInt(1, usuarioId);
+                            novoAluguelStmt.setInt(2, midiaId);
+                            novoAluguelStmt.setTimestamp(3, Timestamp.valueOf(dtPagamento));  // Usar dt_pagamento como dt_inicio
+                            novoAluguelStmt.setTimestamp(4, Timestamp.valueOf(dtPagamento.plusDays(30)));  // Expiração 30 dias depois
+                            novoAluguelStmt.setDouble(5, valorTotal / midiaIds.size());  // Distribuir o valor médio para cada aluguel
+                            novoAluguelStmt.executeUpdate();
+                        }
+                    }
+                }
+
+                conn.commit();  // Commit da transação
             } catch (SQLException e) {
-                conn.rollback();  // Desfazer alterações em caso de erro
+                conn.rollback();  // Rollback em caso de erro
                 throw e;
             }
         }
     }
+
 
 
     // Método para listar compras por usuário

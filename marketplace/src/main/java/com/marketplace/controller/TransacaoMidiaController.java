@@ -15,32 +15,19 @@ public class TransacaoMidiaController {
 
     private final TransacaoMidiaDAO transacaoMidiaDAO = new TransacaoMidiaDAO();
 
-    @PostMapping("/comprar-midia")
-    public ResponseEntity<String> comprarMidia(@RequestParam int usuarioId,
-                                               @RequestParam List<Integer> midiaIds) {
+
+    @PostMapping("/realizar-transacao")
+    public ResponseEntity<String> realizarTransacao(@RequestParam int usuarioId,
+                                                    @RequestParam String paraAlugar,
+                                                    @RequestParam String paraComprar){
         try {
-            transacaoMidiaDAO.comprarMidias(usuarioId, midiaIds);
-            return ResponseEntity.ok("Mídias compradas com sucesso!");
+            transacaoMidiaDAO.criarNotaFiscal(usuarioId, paraComprar, paraAlugar);
+            return ResponseEntity.ok("Mídias compradas e/ou alugadas com sucesso!");
 
         } catch (SQLException e) {
-            return ResponseEntity.badRequest().body("Erro ao registrar compra: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Erro ao registrar NF: " + e.getMessage());
         }
     }
-
-
-    // Endpoint para registrar o aluguel de uma mídia (filme ou série)
-    @PostMapping("/alugar-midia")
-    public ResponseEntity<String> alugarMidias(@RequestParam int usuarioId,
-                                               @RequestParam List<Integer> midiaIds) {
-        try {
-            transacaoMidiaDAO.alugarMidias(usuarioId, midiaIds);
-            return ResponseEntity.ok("Mídias alugadas com sucesso!");
-
-        } catch (SQLException e) {
-            return ResponseEntity.badRequest().body("Erro ao registrar aluguel: " + e.getMessage());
-        }
-    }
-
 
 
     // endpoint para listar compras por usuario

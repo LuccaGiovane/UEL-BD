@@ -1,46 +1,77 @@
 package com.marketplace.dao;
 
+import org.springframework.stereotype.Repository;
+
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.util.Date;
 
+@Repository
 public class RelatorioDAO {
     String user = System.getenv("DB_USER");
-    String url = "jdbc:postgresql://sicm.dc.uel.br:5432/"+user+"?sslmode=prefer";
+    String url = "jdbc:postgresql://sicm.dc.uel.br:5432/"+user+"?sslmode=prefer";//:
     String password = System.getenv("DB_PASSWORD");
 
     public enum FINALIDADE {COMPRA,ALUGUEL};
 
-    public int[][] porPeriodo(int anoInicio, int anoFim, FINALIDADE f) throws SQLException {
-        if(anoFim<anoInicio) return null;
-        int[][] resultado = new int[anoFim-anoInicio+1][12]; // vetor de resultados
-        int i=0; // coluna dos anos
+    public String porPeriodoTabela(int anoInicio, int anoFim, FINALIDADE f) throws SQLException {
+        if (anoFim < anoInicio) return null;
+        StringBuilder resultado = new StringBuilder();  // StringBuilder pra fazer a tabela
 
-        LocalDate inicio = LocalDate.of(anoInicio,1,1);
-        LocalDate fim = LocalDate.of(anoFim,1,1);
+        // Cabeçalho com a descriçao do relatorio
+        resultado.append("==================================\n");
+        resultado.append("Relatório de ").append(f == FINALIDADE.COMPRA ? "Vendas" : "Aluguéis").append(" Por Período:\n");
 
-        try (Connection conn = DriverManager.getConnection(url, user, password)){
-            while (inicio.isBefore(fim) || inicio.isEqual(fim)){
+        String periodo = "[" + anoInicio + "/" + anoFim + "]";
+
+        resultado.append(String.format("%" + ((34 + periodo.length()) / 2) + "s", periodo)).append("\n");
+        resultado.append("==================================\n");
+
+        // Cabeçalho da tabela
+        resultado.append(String.format("%-6s | %-6s | %-12s |\n", "Ano", "Mês", f == FINALIDADE.COMPRA ? "Compras" : "Aluguéis"));
+        resultado.append("----------------------------------\n");
+
+        LocalDate inicio = LocalDate.of(anoInicio, 1, 1);
+        LocalDate fim = LocalDate.of(anoFim, 12, 31);  // Até o final do ano
+        int anoAnterior = -1;  // gambizinha pra ver quando o ano muda xDD
+
+        try (Connection conn = DriverManager.getConnection(url, user, password)) {
+            while (inicio.isBefore(fim) || inicio.isEqual(fim)) {
                 PreparedStatement stmt = null;
-                switch (f){
+                switch (f) {
                     case COMPRA -> stmt = conn.prepareStatement(queryVendasPorPeriodo(inicio));
                     case ALUGUEL -> stmt = conn.prepareStatement(queryAlugueisPorPeriodo(inicio));
                 }
-                
+
                 ResultSet rs = stmt.executeQuery();
 
-                if(rs.next()){
-                    for (Month m : Month.values())
-                        resultado[i][m.getValue()-1] = rs.getInt(m.toString());
+                if (rs.next()) {
+                    // Se mudar o ano poe esses "- - - - - " pra facilitar a visuzalização
+                    if (anoAnterior != -1 && anoAnterior != inicio.getYear()) {
+                        resultado.append("-  -  -  -  -  -  -  -  -  -  -  -\n");
+                    }
+
+                    for (Month m : Month.values()) {
+
+                        String mes = m.toString().substring(0, 3);
+                        int quantidade = rs.getInt(m.toString());
+
+                        // Adicionar a linha na tabela formatada
+                        resultado.append(String.format("%-6d | %-6s | %12d |\n", inicio.getYear(), mes, quantidade));
+                    }
+
+                    // Atualizar o ano anterior
+                    anoAnterior = inicio.getYear();
                 }
-                inicio = inicio.plusYears(1); // proximo ano
-                i+=1; // coluna respectiva do ano
+                inicio = inicio.plusYears(1);
             }
-            return resultado;
         }
+        return resultado.toString();
     }
+
+
 
     private String queryVendasPorPeriodo(LocalDate ano){
         StringBuilder query = new StringBuilder("select ");

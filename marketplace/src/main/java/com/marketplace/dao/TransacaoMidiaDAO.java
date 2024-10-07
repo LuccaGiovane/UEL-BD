@@ -22,8 +22,6 @@ public class TransacaoMidiaDAO {
         String compra = paraCompra;
         if(!paraCompra.isEmpty())  paraCompra+=",";
 
-
-
         String totalValorQuery = "SELECT SUM(midia.valor) AS total FROM marketplace.midia midia WHERE NOT ( midia.id IN ( " +
                 "SELECT m.id FROM marketplace.compra c JOIN marketplace.midia m ON c.midia_id=m.id " +
                 "WHERE usuario_id = ? AND midia_id IN ("+paraCompra+paraAlugar+"))) " +
@@ -57,6 +55,7 @@ public class TransacaoMidiaDAO {
                         if(!paraAlugar.isEmpty()) {
                             alugarMidias(usuarioId, paraAlugar, dtPagamento);
                         }
+                        // return
                     }
                     else throw new SQLException("Erro ao criar nota fiscal.");
                 }

@@ -6,7 +6,6 @@ import java.util.List;
 public interface DAO<T> {
     String user = System.getenv("DB_USER");
     String url = "jdbc:postgresql://sicm.dc.uel.br:5432/"+user+"?sslmode=prefer";
-
     String password = System.getenv("DB_PASSWORD");
 
     /**

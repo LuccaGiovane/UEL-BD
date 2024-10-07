@@ -58,10 +58,37 @@ select SUM(midia.valor) as total from marketplace.midia midia where not ( midia.
 	and midia.id in (25,2,1,1,12,13);
 
 
-SELECT * FROM marketplace.aluguel;
-SELECT * FROM marketplace.compra;
-
+SELECT * FROM marketplace.aluguel order by midia_id;
+SELECT * FROM marketplace.compra order by midia_id;
+SELECT * FROM marketplace.nota_fiscal;
 -- Relatorios
+select 
+	count(case when date('2024-01-01') <= dt_pagamento and dt_pagamento < (date('2024-01-01')+interval '1 month') then 1
+		else null end) as janeiro,
+	count(case when date('2024-02-01') <= dt_pagamento and dt_pagamento < (date('2024-02-01')+interval '1 month') then 1
+		else null end) as fevereiro,
+	count(case when date('2024-03-01') <= dt_pagamento and dt_pagamento < (date('2024-03-01')+interval '1 month') then 1
+		else null end) as marco,
+	count(case when date('2024-04-01') <= dt_pagamento and dt_pagamento < (date('2024-04-01')+interval '1 month') then 1
+		else null end) as abril,
+	count(case when date('2024-05-01') <= dt_pagamento and dt_pagamento < (date('2024-05-01')+interval '1 month') then 1
+		else null end) as maio,
+	count(case when date('2024-06-01') <= dt_pagamento and dt_pagamento < (date('2024-06-01')+interval '1 month') then 1
+		else null end) as junho,
+	count(case when date('2024-07-01') <= dt_pagamento and dt_pagamento < (date('2024-07-01')+interval '1 month') then 1
+		else null end) as julho,
+	count(case when date('2024-08-01') <= dt_pagamento and dt_pagamento < (date('2024-08-01')+interval '1 month') then 1
+		else null end) as agosto,
+	count(case when date('2024-09-01') <= dt_pagamento and dt_pagamento < (date('2024-09-01')+interval '1 month') then 1
+		else null end) as setembro,
+	count(case when date('2024-10-01') <= dt_pagamento and dt_pagamento < (date('2024-10-01')+interval '1 month') then 1
+		else null end) as outubro,
+	count(case when date('2024-11-01') <= dt_pagamento and dt_pagamento < (date('2024-11-01')+interval '1 month') then 1
+		else null end) as novembro,
+	count(case when date('2024-12-01') <= dt_pagamento and dt_pagamento < (date('2024-12-01')+interval '1 month') then 1
+		else null end) as dezembro
+from (marketplace.nota_fiscal nf join marketplace.compra c on c.usuario_id=nf.usuario_id and c.dt_compra=dt_pagamento);
+
 select 
 	count(case when date('2024-01-01') <= dt_pagamento and dt_pagamento < (date('2024-01-01')+interval '1 month') then 1
 		else null end) as janeiro,
@@ -87,9 +114,7 @@ select
 		else null end) as novembro,
 	count(case when date('2024-12-01') <= dt_pagamento and dt_pagamento < (date('2024-11-01')+interval '1 month') then 1
 		else null end) as dezembro
-		
-from (marketplace.nota_fiscal nf join marketplace.compra c on c.usuario_id=nf.usuario_id and c.dt_compra=dt_pagamento);
-
+from (marketplace.nota_fiscal nf join marketplace.aluguel a on a.usuario_id=nf.usuario_id and a.dt_inicio=dt_pagamento);
 
 select date('2024-12-01') + interval '1 month';
 

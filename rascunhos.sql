@@ -11,7 +11,7 @@ select * from marketplace.idiomas_da_midia;
 -- cadastrando usuario
 insert into marketplace.usuario (nome,login,senha,nasc) 
 	values ('eduardo','eduardo','saenha','09-09-2003');
-select id, nome,ativo from marketplace.usuario;
+select * from marketplace.usuario;
 
 -- criou a nota fiscal para os itens abaixo
 -- o certo seria servir só pra um.
@@ -118,7 +118,7 @@ select
 from (marketplace.nota_fiscal nf join marketplace.aluguel a on a.usuario_id=nf.usuario_id and a.dt_inicio=dt_pagamento);
 
 
--- Relatorio 3
+-- Relatorio 3 e 4
 select count(1) as total, m.titulo, m.id from marketplace.nota_fiscal nf 
 	join marketplace.aluguel a on a.usuario_id=nf.usuario_id and a.dt_inicio=dt_pagamento
 	join marketplace.midia m on m.id=a.midia_id
@@ -130,7 +130,7 @@ select count(1) as total,  m.titulo, m.id from marketplace.nota_fiscal nf
 	group by (m.id) order by total desc limit 10;
 
 
--- Relatorio 4
+-- Relatorio 5
 select 
 	sum(case when date('2024-01-01') <= dt_pagamento and dt_pagamento < (date('2024-01-01')+interval '1 month') then nf.valor_total
 		else 0 end) as janeiro,
@@ -157,3 +157,6 @@ select
 	sum(case when date('2024-12-01') <= dt_pagamento and dt_pagamento < (date('2024-12-01')+interval '1 month') then nf.valor_total
 		else 0 end) as dezembro
 from marketplace.nota_fiscal nf;
+
+
+

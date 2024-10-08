@@ -39,4 +39,43 @@ public class RelatorioController {
             return ResponseEntity.status(500).body("Erro ao gerar o relatório de aluguéis: " + e.getMessage());
         }
     }
+
+    // Endpoint para gerar o relatório de top 10 mais vendidos
+    @GetMapping("/mais-vendidos")
+    public ResponseEntity<String> getMaisVendidos() {
+        try {
+            String resultado = relatorioDAO.maisVendidos();
+            return ResponseEntity.ok(resultado);
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Erro ao gerar o relatório de mais vendidos: " + e.getMessage());
+        }
+    }
+
+    // Endpoint para gerar o relatório de top 10 mais alugados
+    @GetMapping("/mais-alugados")
+    public ResponseEntity<String> getMaisAlugados(
+            @RequestParam int anoInicio,
+            @RequestParam int anoFim) {
+        try {
+            String resultado = relatorioDAO.maisAlugados(anoInicio, anoFim);
+            return ResponseEntity.ok(resultado);
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Erro ao gerar o relatório de mais alugados: " + e.getMessage());
+        }
+    }
+
+    // Endpoint para gerar o relatório de receitas em formato de tabela
+    @GetMapping("/receitas/tabela")
+    public ResponseEntity<String> getRelatorioReceitasTabela(
+            @RequestParam int anoInicio,
+            @RequestParam int anoFim) {
+        try {
+            String resultado = relatorioDAO.relatorioReceitas(anoInicio, anoFim);
+            return ResponseEntity.ok(resultado);
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Erro ao gerar o relatório de receitas: " + e.getMessage());
+        }
+    }
+
+
 }

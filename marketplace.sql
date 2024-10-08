@@ -9,12 +9,9 @@ CREATE TABLE marketplace.usuario (
     senha VARCHAR(255) NOT NULL,
     nasc DATE NOT NULL,
 	ativo BOOLEAN DEFAULT TRUE,
-	saldo DECIMAL(10,2),
 
     CONSTRAINT pk_usuario PRIMARY KEY(id),
-    CONSTRAINT uk_usuario_login UNIQUE(login),
-	
-	CONSTRAINT ck_saldo CHECK (saldo>=0.00)
+    CONSTRAINT uk_usuario_login UNIQUE(login)
 );
 
 CREATE TABLE marketplace.idioma(
